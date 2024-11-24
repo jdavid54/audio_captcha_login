@@ -2,7 +2,7 @@
 
   Voici la structure du projet mise à jour :
   
-  > /mon-projet
+   /mon-projet
    
    ├── server.js
   
@@ -19,77 +19,70 @@
     
   Dans cet exemple, captcha.txt est dans un dossier secrets qui ne doit pas être servi directement.
 
+### index.html
+
 
 ### server.js
     const express = require('express');
-            
     const fs = require('fs');
-    
     const path = require('path');
-    
+    const bodyParser = require('body-parser');
     const app = express();
-    
     const port = 3000;
     
-    // Servir les fichiers statiques uniquement depuis le dossier 'public'
+    // Pour lire les requêtes JSON
+    app.use(bodyParser.json());
     
+    // Servir les fichiers statiques uniquement depuis le dossier 'public'
     app.use(express.static(path.join(__dirname, 'public')));
     
     // Route pour la page d'accueil
-    
     app.get('/', (req, res) => {
-    
-    res.sendFile(path.join(__dirname, 'index.html'));
-    
+        res.sendFile(path.join(__dirname, 'index.html'));
     });
     
-    // Endpoint sécurisé pour lire le fichier captcha.txt
+    // Endpoint sécurisé pour vérifier le code du captcha
+    app.post('/verify-captcha', (req, res) => {
+        // Lecture du fichier captcha.txt dans un dossier sécurisé
+        const captchaFilePath = path.join(__dirname, 'secrets', 'captcha.txt');
+        const userInput = req.body.code; // Code soumis par l'utilisateur
     
-    app.get('/get-captcha', (req, res) => {
-    
-    // Lecture du fichier captcha.txt dans un dossier sécurisé
-      
-    const captchaFilePath = path.join(__dirname, 'secrets', 'captcha.txt');
-  
-      fs.readFile(captchaFilePath, 'utf8', (err, data) => {
-      
-          if (err) {
-          
-              res.status(500).send('Erreur lors de la lecture du fichier captcha.');
-              
-          } else {
-          
-              // Envoie le contenu du fichier sans espace supplémentaire
-              
-              res.send(data.trim());
-              
-          }
-          
-      });
-      
+        fs.readFile(captchaFilePath, 'utf8', (err, data) => {
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Erreur lors de la lecture du fichier captcha.' });
+            }
+            
+            const correctCode = data.trim();
+            if (userInput === correctCode) {
+                res.json({ success: true, message: 'Code correct !' });
+            } else {
+                res.json({ success: false, message: 'Code incorrect. Veuillez réessayer.' });
+            }
+        });
     });
-    
+
     // Démarre le serveur
     app.listen(port, () => {
-    
         console.log(`Serveur en écoute sur http://localhost:${port}`);
-        
     });
 
-    
 ### Explications
+    Vérification côté serveur :
+    
+      . L'utilisateur soumet son code à l'endpoint /verify-captcha.
+      . Le serveur lit le fichier captcha.txt de manière sécurisée et compare le code soumis avec celui stocké.
+    
+    Le client ne voit jamais le code :
+    
+      . La validation se fait uniquement côté serveur.
+      . Le client ne reçoit qu'une réponse de succès ou d'échec.
 
-  Structure des dossiers :
-
-  public : contient uniquement des fichiers qui peuvent être accessibles publiquement (par exemple, captcha-audio.mp3).
-
-  secrets : contient des fichiers sensibles, comme captcha.txt. Ce dossier ne doit jamais être servi directement.
-
-### Servir des fichiers sécurisés via un endpoint :
-
-  L'endpoint /get-captcha lit le contenu de captcha.txt de manière sécurisée et envoie uniquement le texte via une réponse HTTP.
-  
-  Le fichier captcha.txt n'est jamais exposé directement dans le navigateur, seul le contenu est envoyé lorsqu'une requête est faite.
+### Remarques de Sécurité
+    Vous pouvez ajouter des mécanismes d'authentification pour protéger davantage cet endpoint (comme un jeton d'authentification si vous avez une session de connexion).
+    
+    Pour éviter les attaques de force brute, implémentez des limites de taux pour restreindre le nombre de tentatives.
+    
+    Assurez-vous que le serveur fonctionne sur HTTPS pour sécuriser la transmission des données.    
 
 ### Étape pour Lancer le Serveur
 
