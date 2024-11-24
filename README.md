@@ -101,6 +101,7 @@ Assurez-vous que votre structure de fichiers est correcte.
 
 ### Accédez à votre application via le navigateur à http://localhost:3000.
 
+
 ![text](image.png)
 
 #### Remarque
