@@ -15,5 +15,5 @@ captcha_text = generate_random_captcha()
 print("Generated CAPTCHA text: ", captcha_text)
 
 audio_captcha = audio.generate (captcha_text)
-audio.write(captcha_text, 'Audio_Captcha.wav')
+audio.write(captcha_text, 'public/Audio_Captcha.wav')
 print("Audio CAPTCHA generated: Audio_Captcha.wav")
