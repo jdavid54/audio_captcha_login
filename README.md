@@ -19,10 +19,13 @@
     
   Dans cet exemple, captcha.txt est dans un dossier secrets qui ne doit pas être servi directement.
 
-### index.html
+## Versions 
+
+### version 0
+  Dans cette version, index1.html et server1.js laissent ouvert le endpoint get-captcha qui permet de lire le contenu du code secret !!!
 
 
-### server.js
+### version 1 : server.js
     const express = require('express');
     const fs = require('fs');
     const path = require('path');
