@@ -61,7 +61,7 @@
         <h2>Captcha Audio</h2>
         <p>Écoutez le captcha et entrez le code ci-dessous :</p>
         <audio controls>
-            <source src="Audio_Captcha.wav" type="audio/wav">
+            <source src="Audio_Captcha.wav" type="audio/mpeg">
             Votre navigateur ne supporte pas l'élément audio.
         </audio>
         <input type="text" id="captchaInput" placeholder="Entrez le code ici">
@@ -70,33 +70,29 @@
     </div>
 
     <script>
+        let correctCaptchaCode = "";
+
+        // Chargement du captcha depuis le serveur
+        fetch('/get-captcha')
+            .then(response => response.text())
+            .then(data => {
+                correctCaptchaCode = data; // Stocke le code correct
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement du captcha :', error);
+            });
+
         function verifyCaptcha() {
             const userInput = document.getElementById('captchaInput').value;
             const messageElement = document.getElementById('message');
 
-            // Envoi de la réponse utilisateur au serveur pour vérification
-            fetch('/verify-captcha', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ code: userInput })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    messageElement.textContent = data.message;
-                    messageElement.className = "success";
-                } else {
-                    messageElement.textContent = data.message;
-                    messageElement.className = "error";
-                }
-            })
-            .catch(error => {
-                console.error('Erreur lors de la vérification du captcha :', error);
-                messageElement.textContent = "Une erreur est survenue. Veuillez réessayer.";
+            if (userInput === correctCaptchaCode) {
+                messageElement.textContent = "Code correct ! Vous êtes connecté.";
+                messageElement.className = "success";
+            } else {
+                messageElement.textContent = "Code incorrect. Veuillez réessayer.";
                 messageElement.className = "error";
-            });
+            }
         }
     </script>
 </body>
