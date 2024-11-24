@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captcha Audio pour Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 100%;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .success {
+            color: green;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Captcha Audio</h2>
+        <p>Écoutez le captcha et entrez le code ci-dessous :</p>
+        <audio controls>
+            <source src="Audio_Captcha.wav" type="audio/mpeg">
+            Votre navigateur ne supporte pas l'élément audio.
+        </audio>
+        <input type="text" id="captchaInput" placeholder="Entrez le code ici">
+        <button onclick="verifyCaptcha()">Vérifier</button>
+        <p id="message" class="error"></p>
+    </div>
+
+    <script>
+        let correctCaptchaCode = "";
+
+        // Chargement du captcha depuis le serveur
+        fetch('/get-captcha')
+            .then(response => response.text())
+            .then(data => {
+                correctCaptchaCode = data; // Stocke le code correct
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement du captcha :', error);
+            });
+
+        function verifyCaptcha() {
+            const userInput = document.getElementById('captchaInput').value;
+            const messageElement = document.getElementById('message');
+
+            if (userInput === correctCaptchaCode) {
+                messageElement.textContent = "Code correct ! Vous êtes connecté.";
+                messageElement.className = "success";
+            } else {
+                messageElement.textContent = "Code incorrect. Veuillez réessayer.";
+                messageElement.className = "error";
+            }
+        }
+    </script>
+</body>
+</html>
