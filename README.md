@@ -101,6 +101,8 @@ Assurez-vous que votre structure de fichiers est correcte.
 
 ### Accédez à votre application via le navigateur à http://localhost:3000.
 
+![text](image.png)
+
 #### Remarque
   
   En utilisant cette méthode, seul le serveur a accès à captcha.txt. Le navigateur ne peut voir que les réponses aux requêtes HTTP.
